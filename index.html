@@ -70,7 +70,7 @@
                         <p>${item.content}</p>
                         <p><strong>Автор:</strong> ${item.author}</p>
                         <p><strong>Дата:</strong> ${new Date(item.date).toLocaleDateString()}</p>
-                        ${item.img ? `<img src="http://localhost:3000${item.img}" alt="Новость">` : ""}
+                        ${item.img ? `<img src="https://server-test-production-6d80.up.railway.app${item.img}" alt="Новость">` : ""}
                     `;
 
                     newsContainer.appendChild(newsElement);
