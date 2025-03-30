@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новости</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        .news-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .news-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .news-item img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Новости</h1>
+
+    <!-- Форма для добавления новости -->
+    <form id="newsForm">
+        <input type="text" id="title" placeholder="Заголовок" required> <br>
+        <textarea id="content" placeholder="Текст новости" required></textarea> <br>
+        <input type="text" id="author" placeholder="Автор" required> <br>
+        <input type="file" id="img" accept="image/*"> <br>
+        <button type="submit">Добавить новость</button>
+    </form>
+
+    <!-- Контейнер для отображения новостей -->
+    <div class="news-container" id="newsContainer"></div>
+
+    <script>
+        async function loadNews() {
+            const newsContainer = document.getElementById("newsContainer");
+
+            if (!newsContainer) {
+                console.error("❌ Ошибка: контейнер #newsContainer не найден!");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:3000/news");
+                const news = await response.json();
+
+                newsContainer.innerHTML = ""; // Очищаем перед добавлением новых
+
+                news.forEach(item => {
+                    const newsElement = document.createElement("div");
+                    newsElement.classList.add("news-item");
+
+                    newsElement.innerHTML = `
+                        <h2>${item.title}</h2>
+                        <p>${item.content}</p>
+                        <p><strong>Автор:</strong> ${item.author}</p>
+                        <p><strong>Дата:</strong> ${new Date(item.date).toLocaleDateString()}</p>
+                        ${item.img ? `<img src="http://localhost:3000${item.img}" alt="Новость">` : ""}
+                    `;
+
+                    newsContainer.appendChild(newsElement);
+                });
+            } catch (error) {
+                console.error("❌ Ошибка загрузки новостей:", error);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadNews);
+
+        // Добавление новой новости
+        document.getElementById("newsForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const title = document.getElementById("title").value;
+            const content = document.getElementById("content").value;
+            const author = document.getElementById("author").value;
+            const imgInput = document.getElementById("img").files[0];
+
+            const formData = new FormData();
+            formData.append("title", title);
+            formData.append("content", content);
+            formData.append("author", author);
+            if (imgInput) formData.append("img", imgInput);
+
+            try {
+                const response = await fetch("http://localhost:3000/news", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error("Ошибка при добавлении новости");
+                }
+
+                alert("✅ Новость добавлена!");
+                loadNews(); // Перезагружаем список новостей
+            } catch (error) {
+                console.error("❌ Ошибка при добавлении новости:", error);
+            }
+        });
+    </script>
+</body>
+</html>
