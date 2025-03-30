@@ -4,7 +4,7 @@ const News = require("../models/news");
 exports.addNews = async (req, res) => {
     try {
         const { title, content, author } = req.body;
-        const img = req.file ? `/uploads/${req.file.filename}` : ""; // Сохранение пути к файлу
+        const img = req.file ? `https://server-test-production-6d80.up.railway.app/uploads/${req.file.filename}` : ""; // Сохранение пути к файлу
         
         const newNews = new News({ title, content, author, img });
         await newNews.save();
